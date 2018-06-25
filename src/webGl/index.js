@@ -18,48 +18,50 @@ export default {
     },
     methods: {
         initRender(){
-            this.renderer = new THREE.WebGLRenderer({antialias: true});
+            this.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
             this.renderer.setSize(this.$el.clientWidth, this.$el.clientHeight);
             this.$el.appendChild(this.renderer.domElement);
             this.renderer.setClearColor(0xf8f8f9, 1.0);
-
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 
         },
         initCamera(perspective=true){
             if (perspective){
                 this.camera = new THREE.PerspectiveCamera(45, this.$el.clientWidth / this.$el.clientHeight, 1, 10000);
-                this.camera.position.x = -10;
-                this.camera.position.y = 2;
-                this.camera.position.z = 10;
+                this.camera.position.x = 50;
+                this.camera.position.y = 50;
+                this.camera.position.z = 50;
                 this.camera.up.x = 0;
                 this.camera.up.y = 1;
                 this.camera.up.z = 0;
                 this.camera.lookAt(0,0,0);
             }else{
-                this.camera = new THREE.OrthographicCamera(this.$el.clientWidth / -2, this.$el.clientWidth / 2,
-                    this.$el.clientHeight / 2, this.$el.clientHeight / -2, 1, 1000);
+                console.log(this.$el.clientWidth, this.$el.clientHeight);
+                let clientWidth = this.$el.clientWidth;
+                let clientHeight = this.$el.clientHeight;
+
+                this.camera = new THREE.OrthographicCamera(clientWidth / -2, clientWidth / 2,
+                    clientHeight / 2, clientHeight / -2, 1, 1000);
+                this.camera.position.y = 10;
                 this.camera.lookAt(0,0,0);
             }
-
+            this.scene.add(this.camera);
 
 
 
         },
         initScene(){
             this.scene = new THREE.Scene();
+
+            let axes = new THREE.AxesHelper(100);
+            this.scene.add(axes)
+
+            this.scene.fog = new THREE.Fog(0xffffff, 0.015, 300)
         },
         initLight(){
-            let envLight = new THREE.AmbientLight(0xFFFFFF, 0.3);
-            this.scene.add(envLight);
 
-            //let pointLight = new THREE.PointLight(0xFFFFFF, 0.8, 500);
-            //pointLight.position.set(-50, 0, 0);
-            //this.scene.add(pointLight);
-
-            let directLight = new THREE.DirectionalLight(0xFFFFFF, 0.8);
-            directLight.position.set(-50, 200, -50);
-            this.scene.add(directLight);
         },
         initStats(){
             this.stats = new Stats();
@@ -70,8 +72,8 @@ export default {
         },
         init(){
             this.initRender();
-            this.initCamera();
             this.initScene();
+            this.initCamera(true);
             this.initLight();
             this.initStats();
 
