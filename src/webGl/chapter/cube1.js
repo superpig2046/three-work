@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
 
 import Cube from '../blocks/cube'
+import {PhongCube} from "../blocks/cube";
+
 
 let createCube = (width, height, depth, color, x, y, z) => {
     let geometry = new THREE.CubeGeometry(width, height, depth);
@@ -107,13 +109,15 @@ export default (renderer, scene, camera, stats, el) => {
     let cube2 = new Cube(20, 10, 10, 0x9ccc65, 5, 0, 15);
     let cube3 = new Cube(20, 5, 20, 0x9ccc65, -15, 0, 15);
     let cube4 = createTransCube(20, 20, 2, 0x9ccc65, 0, 0, -20);
-    let cube5 = new Cube(5, 13, 5, 0x9ccc65, -5, 0, 10);
+    let cube5 = new PhongCube(5, 13, 5, 0x9ccc65, -5, 0, 10);
 
     scene.add(cube.mesh);
     scene.add(cube2.mesh);
     scene.add(cube3.mesh);
     scene.add(cube4);
     scene.add(cube5.mesh);
+
+    console.log(cube5.mesh);
 
     //shadeDirectWithEvn(scene, plane);
     shadeHemiLight(scene, plane);
@@ -163,10 +167,10 @@ export default (renderer, scene, camera, stats, el) => {
 
         //camera.position.x += 0.05;
 
-        let timer = Date.now() * 0.0005;
-        camera.position.x = Math.cos(timer) * 50;
-        camera.position.z = Math.sin(timer) * 50;
-        camera.lookAt(0,0,0);
+        //let timer = Date.now() * 0.0005;
+        //camera.position.x = Math.cos(timer) * 50;
+        //camera.position.z = Math.sin(timer) * 50;
+        //camera.lookAt(0,0,0);
 
         renderer.render(scene, camera);
         requestAnimationFrame(render);

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import Stats from 'stats-js'
+import * as TWEEN from '@tweenjs/tween.js'
 
 import plotCubeOne from './chapter/cube1';
 
@@ -13,7 +14,10 @@ export default {
             renderer: null,
             light: null,
             states: null,
-            controls: null
+            controls: null,
+            cameraLookAtX: 0,
+            cameraLookAtY: 0,
+            cameraLookAtZ: 0,
         }
     },
     methods: {
@@ -27,16 +31,168 @@ export default {
 
 
         },
+        scrollWheel(ev){
+            console.log('scroll', ev);
+        },
+        initCameraEvents(){
+            console.log('add camera events');
+
+            let mouseWheelTimeout = null;
+
+            this.$el.onmousewheel = (ev) => {
+                if (mouseWheelTimeout){
+
+                }else{
+                    mouseWheelTimeout = setTimeout(()=>{
+                        let target = new THREE.Vector3(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ)
+
+                        let cameraArray = this.camera.getWorldDirection(target);
+                        let deltaX = cameraArray.x * ev.wheelDelta;
+                        let deltaY = cameraArray.y * ev.wheelDelta;
+                        let deltaZ = cameraArray.z * ev.wheelDelta;
+                        this.camera.position.x = this.camera.position.x + deltaX;
+                        this.camera.position.y = this.camera.position.y + deltaY;
+                        this.camera.position.z = this.camera.position.z + deltaZ;
+
+
+                        clearTimeout(mouseWheelTimeout);
+                        mouseWheelTimeout = null;
+                    }, 50)
+                }
+            };
+
+            let keyDownTimeout = null;
+
+            this.$el.onkeydown = (ev) => {
+                if (keyDownTimeout){
+
+                }else{
+                    keyDownTimeout = setTimeout(()=>{
+                        let target = new THREE.Vector3(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ);
+                        let cameraArray = this.camera.getWorldDirection(target);
+
+                        switch(ev.key){
+                            case 'w':
+
+                                this.cameraLookAtZ += cameraArray.z * 10;
+                                this.cameraLookAtX += cameraArray.x * 10;
+                                new TWEEN.Tween(this.camera.position)
+                                    .to({z: this.camera.position.z + cameraArray.z * 10,
+                                        x: this.camera.position.x + cameraArray.x * 10}, 50)
+                                    .start();
+                                //this.camera.position.z += cameraArray.z * 10;
+                                //this.camera.position.x += cameraArray.x * 10;
+                                break;
+                            case 's':
+                                this.cameraLookAtZ -= cameraArray.z * 10;
+                                this.cameraLookAtX -= cameraArray.x * 10;
+                                //this.camera.position.z -= cameraArray.z * 10;
+                                //this.camera.position.x -= cameraArray.x * 10;
+                                new TWEEN.Tween(this.camera.position)
+                                    .to({z: this.camera.position.z - cameraArray.z * 10,
+                                        x: this.camera.position.x - cameraArray.x * 10}, 50)
+                                    .start();
+                                break;
+                            case 'a':
+                                this.cameraLookAtZ -= cameraArray.z * 10;
+                                this.cameraLookAtX += cameraArray.x * 10;
+                                //this.camera.position.z -= cameraArray.z * 10;
+                                //this.camera.position.x += cameraArray.x * 10;
+                                new TWEEN.Tween(this.camera.position)
+                                    .to({z: this.camera.position.z - cameraArray.z * 10,
+                                        x: this.camera.position.x + cameraArray.x * 10}, 50)
+                                    .start();
+                                break;
+                            case 'd':
+                                this.cameraLookAtZ += cameraArray.z * 10;
+                                this.cameraLookAtX -= cameraArray.x * 10;
+                                //this.camera.position.z += cameraArray.z * 10;
+                                //this.camera.position.x -= cameraArray.x * 10;
+                                new TWEEN.Tween(this.camera.position)
+                                    .to({z: this.camera.position.z + cameraArray.z * 10,
+                                        x: this.camera.position.x - cameraArray.x * 10}, 50)
+                                    .start();
+                                break;
+                        }
+
+
+                        clearTimeout(keyDownTimeout);
+                        keyDownTimeout = null;
+                    }, 50)
+                }
+
+            }
+
+            let mouseMoveTimeout = null;
+            let movePosX = null;
+            let movePosY = null;
+            let moveAngle = null;
+
+            let handleMouseMove = (ev) =>{
+                if (mouseMoveTimeout){
+
+                }else{
+                    mouseWheelTimeout = setTimeout(()=>{
+                        //console.log('>>>', ev.offsetX);
+                        if (moveAngle === null){
+                            moveAngle = Math.atan(this.camera.position.z / this.camera.position.x);
+                        }
+
+                        if (movePosX && movePosY){
+                            let deltaX = ev.clientX - movePosX;
+
+                            let distance = this.camera.position.z / Math.sin(moveAngle);
+                            let deltaAngle = Math.atan(deltaX / distance);
+                            //console.log((angle + deltaAngle) / Math.PI * 180);
+                            moveAngle = moveAngle - deltaAngle;
+
+                            //console.log(angle / Math.PI * 180, '>>>',  moveAngle / Math.PI * 180);
+
+                            this.camera.position.x = distance * Math.cos(moveAngle);
+                            this.camera.position.z = distance * Math.sin(moveAngle);
+
+
+                            this.camera.position.y += ev.clientY - movePosY;
+                            this.camera.lookAt(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ);
+                        }
+
+                        movePosX = ev.clientX;
+                        movePosY = ev.clientY;
+
+
+                        clearTimeout(mouseWheelTimeout);
+                        mouseWheelTimeout = null;
+
+                    }, 50)
+                }
+            };
+
+            this.$el.onmousedown = (ev) => {
+                movePosX = null;
+                movePosY = null;
+                //moveAngle = null;
+                this.$el.addEventListener('mousemove', handleMouseMove)
+            };
+
+            this.$el.onmouseup = (ev) => {
+                this.$el.removeEventListener('mousemove', handleMouseMove);
+                movePosX = null;
+                movePosY = null;
+                //moveAngle = null;
+            }
+
+
+        },
         initCamera(perspective=true){
             if (perspective){
                 this.camera = new THREE.PerspectiveCamera(45, this.$el.clientWidth / this.$el.clientHeight, 1, 10000);
-                this.camera.position.x = 50;
+                this.camera.position.x = -50;
                 this.camera.position.y = 50;
-                this.camera.position.z = 50;
+                this.camera.position.z = -50;
                 this.camera.up.x = 0;
                 this.camera.up.y = 1;
                 this.camera.up.z = 0;
-                this.camera.lookAt(0,0,0);
+                this.camera.lookAt(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ);
             }else{
                 console.log(this.$el.clientWidth, this.$el.clientHeight);
                 let clientWidth = this.$el.clientWidth;
@@ -45,20 +201,19 @@ export default {
                 this.camera = new THREE.OrthographicCamera(clientWidth / -2, clientWidth / 2,
                     clientHeight / 2, clientHeight / -2, 1, 1000);
                 this.camera.position.y = 10;
-                this.camera.lookAt(0,0,0);
+                this.camera.lookAt(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ);
             }
+            this.initCameraEvents();
             this.scene.add(this.camera);
-
-
 
         },
         initScene(){
             this.scene = new THREE.Scene();
 
             let axes = new THREE.AxesHelper(100);
-            this.scene.add(axes)
+            this.scene.add(axes);
 
-            this.scene.fog = new THREE.Fog(0xffffff, 0.015, 300)
+            this.scene.fog = new THREE.Fog(0xffffff, 0.015, 400)
         },
         initLight(){
 
@@ -138,10 +293,9 @@ export default {
     mounted(){
         this.init();
         plotCubeOne(this.renderer, this.scene, this.camera, this.stats, this.$el);
-        //this.plotCube();
-        //this.plotColorLine();
-        //this.plotGrid();
-        //this.draw()
+    },
+    beforeDestroy(){
+        //document.removeEventListener('DOMMouseScroll', this.scrollWheel, false)
     },
     render: function(h){
         return h('div', {style: {width: '100%', height: '600px'}})
