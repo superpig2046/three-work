@@ -36,7 +36,8 @@ class Cube{
 class PhongCube extends Cube{
     createMesh(){
         let geometry = new THREE.CubeGeometry(this.width, this.height, this.depth);
-        let material = new THREE.MeshPhongMaterial({color: this.color,
+        let material = new THREE.MeshPhongMaterial({
+            color: this.color, transparent: true, opacity: .6,
             specular: 0xffffff});
 
         this.mesh = new THREE.Mesh(geometry, material);

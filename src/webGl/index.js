@@ -133,7 +133,6 @@ export default {
 
                 }else{
                     mouseWheelTimeout = setTimeout(()=>{
-                        //console.log('>>>', ev.offsetX);
                         if (moveAngle === null){
                             moveAngle = Math.atan(this.camera.position.z / this.camera.position.x);
                         }
@@ -143,16 +142,14 @@ export default {
 
                             let distance = this.camera.position.z / Math.sin(moveAngle);
                             let deltaAngle = Math.atan(deltaX / distance);
-                            //console.log((angle + deltaAngle) / Math.PI * 180);
-                            moveAngle = moveAngle - deltaAngle;
 
-                            //console.log(angle / Math.PI * 180, '>>>',  moveAngle / Math.PI * 180);
+                            moveAngle = moveAngle - deltaAngle;
 
                             this.camera.position.x = distance * Math.cos(moveAngle);
                             this.camera.position.z = distance * Math.sin(moveAngle);
 
-
-                            this.camera.position.y += ev.clientY - movePosY;
+                            this.camera.position.y = this.camera.position.y + ev.clientY - movePosY < 10 ?
+                                10 : this.camera.position.y + ev.clientY - movePosY;
                             this.camera.lookAt(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ);
                         }
 
@@ -205,6 +202,9 @@ export default {
             }
             this.initCameraEvents();
             this.scene.add(this.camera);
+
+            //let cameraControl = new THREE.OrbitAndPanControls(this.camera, this.renderer.domElement);
+            //cameraControl.target.set(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ);
 
         },
         initScene(){
