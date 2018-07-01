@@ -4,6 +4,9 @@ import * as TWEEN from '@tweenjs/tween.js';
 import Cube from '../blocks/cube'
 import {PhongCube} from "../blocks/cube";
 
+import * as MATERIAL from '../material'
+import * as HOUSE from '../house'
+
 
 let createCube = (width, height, depth, color, x, y, z) => {
     let geometry = new THREE.CubeGeometry(width, height, depth);
@@ -68,19 +71,25 @@ let shadeDirectWithEvn = (scene, plane) =>{
     scene.add(directLightHelper);
 };
 
-let shadeHemiLight = (scene, plane) => {
-    let light = new THREE.HemisphereLight(0xffffff, 0x000000, 0.6);
-    light.position.set(0, 30, -50);
-    //light.castShadow = true;
+let shadeHemiLight = (scene) => {
+    //let light = new THREE.HemisphereLight(0xffffff, 0x333333, 0.5);
+    //light.position.set(0, 30, 0);
+    ////light.castShadow = true;
+    //
+    //scene.add(light);
 
-    scene.add(light);
+    let envLight = new THREE.AmbientLight(0xFFFFFF, 0.3);
+    scene.add(envLight);
 
-    let directLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    directLight.position.set(0, 30, -50);
+    let target = new THREE.Object3D();
+    target.position.set(0, 0, 0);
+
+    let directLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directLight.position.set(10, 30, 50);
     directLight.castShadow = true;
-    directLight.target = plane;
-    directLight.shadow.camera.near = 2;
-    directLight.shadow.camera.far = 100;
+    directLight.target = target;
+    directLight.shadow.camera.near = 20;
+    directLight.shadow.camera.far = 85;
     directLight.shadow.camera.left = -50;
     directLight.shadow.camera.right = 50;
     directLight.shadow.camera.top = 50;
@@ -102,28 +111,10 @@ let createSpotLight = (color) =>{
 
 export default (renderer, scene, camera, stats, el) => {
 
-    let plane = createPlane();
-    scene.add(plane);
+    shadeHemiLight(scene);
 
-    let cube = new Cube(10, 20, 10, 0x9ccc65, 0, 0 ,0);
-    let cube2 = new Cube(20, 10, 10, 0x9ccc65, 5, 0, 15);
-    let cube3 = new Cube(20, 5, 20, 0x9ccc65, -15, 0, 15);
-    let cube4 = createTransCube(20, 20, 2, 0x9ccc65, 0, 0, -20);
-    let cube5 = new PhongCube(5, 13, 5, 0x9ccc65, -5, 0, 10);
-
-    scene.add(cube.mesh);
-    scene.add(cube2.mesh);
-    scene.add(cube3.mesh);
-    scene.add(cube4);
-    scene.add(cube5.mesh);
-
-    console.log(cube5.mesh);
-
-    //shadeDirectWithEvn(scene, plane);
-    shadeHemiLight(scene, plane);
-
-
-
+    let room = HOUSE.Room();
+    scene.add(room);
 
     //scene.add(edges);
     //scene.add(edges1);
@@ -151,6 +142,8 @@ export default (renderer, scene, camera, stats, el) => {
     //parseOne.chain(parseTwo);
     //parseOne.start();
 
+    //new TWEEN.Tween(cube.mesh.scale)
+    //    .to({y: 2.0}, 3000).start();
 
     // render function
     let render = () => {
@@ -171,6 +164,8 @@ export default (renderer, scene, camera, stats, el) => {
         //camera.position.x = Math.cos(timer) * 50;
         //camera.position.z = Math.sin(timer) * 50;
         //camera.lookAt(0,0,0);
+
+
 
         renderer.render(scene, camera);
         requestAnimationFrame(render);

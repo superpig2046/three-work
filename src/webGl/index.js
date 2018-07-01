@@ -143,13 +143,14 @@ export default {
                             let distance = this.camera.position.z / Math.sin(moveAngle);
                             let deltaAngle = Math.atan(deltaX / distance);
 
-                            moveAngle = moveAngle - deltaAngle;
+                            moveAngle = moveAngle + deltaAngle;
 
                             this.camera.position.x = distance * Math.cos(moveAngle);
                             this.camera.position.z = distance * Math.sin(moveAngle);
 
-                            this.camera.position.y = this.camera.position.y + ev.clientY - movePosY < 10 ?
-                                10 : this.camera.position.y + ev.clientY - movePosY;
+                            //this.camera.position.y = this.camera.position.y + ev.clientY - movePosY < 10 ?
+                            //    10 : this.camera.position.y + ev.clientY - movePosY;
+                            this.camera.position.y += ev.clientY - movePosY;
                             this.camera.lookAt(this.cameraLookAtX, this.cameraLookAtY, this.cameraLookAtZ);
                         }
 
@@ -183,9 +184,9 @@ export default {
         initCamera(perspective=true){
             if (perspective){
                 this.camera = new THREE.PerspectiveCamera(45, this.$el.clientWidth / this.$el.clientHeight, 1, 10000);
-                this.camera.position.x = -50;
+                this.camera.position.x = 10;
                 this.camera.position.y = 50;
-                this.camera.position.z = -50;
+                this.camera.position.z = 50;
                 this.camera.up.x = 0;
                 this.camera.up.y = 1;
                 this.camera.up.z = 0;
