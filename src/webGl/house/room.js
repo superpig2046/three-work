@@ -8,6 +8,8 @@ import * as MATERIAL from '../material'
 
 import {optionGeo} from '../blocks/optionGeo'
 
+import roadUrl from '../../model/Road.obj'
+
 let addFloor = (room) => {
     let floorGeometry = new THREE.PlaneGeometry(60, 40);
     let floorMaterial = new THREE.MeshLambertMaterial({color: 0x1c2438});
@@ -99,19 +101,29 @@ let addOption = (room) =>{
     room.add(optionGeo())
 };
 
+let addObj = (room) => {
+
+    let loader = new THREE.ObjectLoader();
+    console.log('>>>>', roadUrl);
+    loader.load(roadUrl, (group) => {
+        console.log('<<<<', group)
+        room.add(obj);
+    })
+};
+
 let Room = () => {
     let room = new THREE.Object3D();
 
-    addFloor(room);
-    addWall(room);
-    addTelevision(room);
-    addDesk(room);
-
-    addWallBoard(room);
+    // addFloor(room);
+    // addWall(room);
+    // addTelevision(room);
+    // addDesk(room);
+    //
+    // addWallBoard(room);
 
     //addOption(room);
 
-
+    addObj(room);
 
 
     return room

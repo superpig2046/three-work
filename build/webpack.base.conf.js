@@ -58,6 +58,13 @@ module.exports = {
         }
       },
       {
+        test: /\.obj$/,
+        loader: 'file-loader',
+        query:{
+            name: utils.assetsPath('model/[name].[hash:7].[ext]')
+        }
+      },
+      {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         options: {
