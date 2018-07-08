@@ -2,13 +2,32 @@
  * Created by yonghan on 2018/6/30.
  */
 
-import * as THREE from 'three'
+import * as THREEJS from 'three'
+//import * as THREEADDONS from 'three-addons'
+//import {OBJLoader} from '../../lib/OBJLoader'
+import {MTLLoader} from '../../lib/MTLLoader'
+import OBJLoader from 'three-obj-loader'
+const THREE = {...THREEJS, MTLLoader};
+
+OBJLoader(THREE);
+
+//import MTLLoader from 'three-mtl-loader'
+//import OBJMTLLoader from 'three-objmtll-loader'
+
+
+
+
+//OBJLoader(THREE);
+//MTLLoader(THREE);
+//OBJMTLLoader(THREE);
 
 import * as MATERIAL from '../material'
 
 import {optionGeo} from '../blocks/optionGeo'
 
-import roadUrl from '../../model/Road.obj'
+import roadUrl from '../../model/Road/Road.obj'
+import roadMtlUrl from '../../model/Road/Road.mtl'
+import roadPng from '../../model/Road/Road.png'
 
 let addFloor = (room) => {
     let floorGeometry = new THREE.PlaneGeometry(60, 40);
@@ -103,13 +122,39 @@ let addOption = (room) =>{
 
 let addObj = (room) => {
 
-    let loader = new THREE.ObjectLoader();
-    console.log('>>>>', roadUrl);
-    loader.load(roadUrl, (group) => {
-        console.log('<<<<', group)
-        room.add(obj);
+    let mtLoader = new THREE.MTLLoader();
+    mtLoader.setPath('static/model/');
+    mtLoader.load('Road.mtl', (material) => {
+        material.preload();
+        //console.log('material', material);
+        let loader = new THREE.OBJLoader();
+        //console.log('>>> obj loader', loader);
+        loader.setMaterials(material);
+        loader.setPath('static/model/');
+        loader.load('Road.obj', (group) => {
+            //console.log('group', group);
+
+            room.add(group);
+        })
     })
 };
+
+let addObjOnly = (room) =>{
+    let loader = new THREE.OBJLoader();
+    loader.load(roadUrl, (group) => {
+        //console.log('group', group);
+        room.add(group);
+    })
+};
+
+
+// let addObjMtl = (room) => {
+//     let loader = new OBJMTLLoader();
+//     loader.load(roadUrl, roadMtlUrl, (obj)=>{
+//         console.log(obj);
+//     })
+//
+// };
 
 let Room = () => {
     let room = new THREE.Object3D();
@@ -124,6 +169,9 @@ let Room = () => {
     //addOption(room);
 
     addObj(room);
+    //addObjOnly(room);
+
+    //addObjMtl(room);
 
 
     return room

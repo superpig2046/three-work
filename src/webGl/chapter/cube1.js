@@ -78,13 +78,13 @@ let shadeHemiLight = (scene) => {
     //
     //scene.add(light);
 
-    let envLight = new THREE.AmbientLight(0xFFFFFF, 0.3);
+    let envLight = new THREE.AmbientLight(0xFFFFFF, 0.6);
     scene.add(envLight);
 
     let target = new THREE.Object3D();
     target.position.set(0, 0, 0);
 
-    let directLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    let directLight = new THREE.DirectionalLight(0xffffff, 1);
     directLight.position.set(10, 30, 50);
     directLight.castShadow = true;
     directLight.target = target;

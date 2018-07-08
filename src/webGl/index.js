@@ -3,6 +3,7 @@ import Stats from 'stats-js'
 import * as TWEEN from '@tweenjs/tween.js'
 
 import plotCubeOne from './chapter/cube1';
+import farm from './chapter/farm'
 
 
 export default {
@@ -184,9 +185,9 @@ export default {
         initCamera(perspective=true){
             if (perspective){
                 this.camera = new THREE.PerspectiveCamera(45, this.$el.clientWidth / this.$el.clientHeight, 1, 10000);
-                this.camera.position.x = 10;
-                this.camera.position.y = 50;
-                this.camera.position.z = 50;
+                this.camera.position.x = 30;
+                this.camera.position.y = 180;
+                this.camera.position.z = 180;
                 this.camera.up.x = 0;
                 this.camera.up.y = 1;
                 this.camera.up.z = 0;
@@ -214,7 +215,7 @@ export default {
             let axes = new THREE.AxesHelper(100);
             this.scene.add(axes);
 
-            this.scene.fog = new THREE.Fog(0xffffff, 0.015, 400)
+            this.scene.fog = new THREE.Fog(0xffffff, 0.015, 600)
         },
         initLight(){
 
@@ -293,7 +294,7 @@ export default {
     },
     mounted(){
         this.init();
-        plotCubeOne(this.renderer, this.scene, this.camera, this.stats, this.$el);
+        farm(this.renderer, this.scene, this.camera, this.stats, this.$el);
     },
     beforeDestroy(){
         //document.removeEventListener('DOMMouseScroll', this.scrollWheel, false)
